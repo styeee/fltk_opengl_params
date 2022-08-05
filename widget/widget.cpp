@@ -4,8 +4,6 @@
 #include "visual.h"
 #include <math.h>
 
-
-
 int main()
 {
     Fl_Window win(1200,800,"line");
@@ -62,7 +60,6 @@ int main()
         ,x,y,a,r,g,b);
         
     win.end();
-    //win.resizable(TEST);
     win.show();
 
     return Fl::run();
