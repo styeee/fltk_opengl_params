@@ -8,7 +8,7 @@
 #include <Fl/Fl_Group.H>
 #include <Fl/Fl_Box.H>
 
-template<unsigned char count,unsigned char name_size=4>
+template<size_t count,size_t name_size=4>
 class visual:public Fl_Group
 {
     int params[count];
@@ -49,7 +49,7 @@ public:
         :Fl_Group(x,y,w,h)
     {
         const size_t slider_size=200;
-        const size_t slider_pos=h-slider_size;
+        const size_t slider_pos=y+h-slider_size;
 
         const size_t slider_wide=w-50;
         
@@ -58,7 +58,7 @@ public:
 
         const size_t slider_hax=slider_pos+slider_double;
 
-        c=new canvas(x,y,w,slider_pos,f,params);
+        c=new canvas(x,y,w,slider_pos-y,f,params);
 
         s=new Fl_Scroll(x,slider_pos,w,slider_size);
             m=new Fl_Box(x+slider_metric,slider_pos,slider_wide,slider_metric);
@@ -99,7 +99,7 @@ public:
 
 const char*params_beauty(const char*text)
 {
-    char*buffer=new char[strlen(text)];
+    char*buffer=new char[strlen(text)+1]{0};
 
     for(size_t i=0;text[i];i++)
     {
@@ -111,5 +111,8 @@ const char*params_beauty(const char*text)
 }
 
 #define max_letters 4
-#define desribe_visual(name,x,y,w,h,f,...) enum params:char{__VA_ARGS__,sys_last};\
-visual<sys_last,max_letters>name(x,y,w,h,f,params_beauty(#__VA_ARGS__));\
+
+#define desribe_visual(name,x,y,w,h,f,...) enum class name##_p{__VA_ARGS__,sys_last};\
+visual<size_t(name##_p::sys_last),max_letters>name(x,y,w,h,[](int*param) f,params_beauty(#__VA_ARGS__));\
+
+#define vis_get(name,id) param[size_t(name##_p::id)]
