@@ -4,63 +4,43 @@
 #include "visual.h"
 #include <math.h>
 
+const size_t size=512;
+float points[size]={0};
+float time;
+
+static void timer(void*d)
+{
+    ((visual<4,2>*)d)->redraw();
+    Fl::repeat_timeout(.025,timer,d);
+}
+
 int main()
 {
+
     Fl_Window win(1200,800,"line");
 
-        #define max_letters 3
-        desribe_visual(line,0,0,600,400,
+        #define max_letters 2
+        desribe_visual(graph,0,0,1200,800,
         {
-            glLineWidth(vis_get(line,ll)>>3);
+            time+=(vis_get(graph,t)-1)/100.;
+
+            for(size_t i=0;i<size;i++)
+                points[i]=sin(time+i/(vis_get(graph,w)+.001))
+                *vis_get(graph,s)/100.
+                +vis_get(graph,h)/100.;
 
             glBegin(GL_LINE_STRIP);
-                glVertex2f(vis_get(line,x1)/100.,vis_get(line,y1)/100.);
-                glVertex2f(vis_get(line,x2)/100.,vis_get(line,y2)/100.);
+                for(size_t i=0;i<size;i++)
+                    glVertex2f(float(i)/size,points[i]);
             glEnd();
         }
-        ,x1,y1,x2,y2,ll);
+        ,h,s,w,t);
         
-        #define max_letters 2
-        desribe_visual(point,600,0,600,400,
-        {
-            glPointSize(vis_get(point,l));
-
-            glBegin(0);
-                glVertex2f(vis_get(point,x)/100.,vis_get(point,y)/100.);
-            glEnd();
-        }
-        ,x,y,l);
-        
-        desribe_visual(round,0,400,600,400,
-        {
-            glBegin(GL_POLYGON);
-            constexpr float ratio=600./400.;
-            for(float i=0;i<6.2831;i+=(6.2831/vis_get(round,d)))
-                glVertex2f(vis_get(round,x)/100.+cos(i)/vis_get(round,r)/ratio,vis_get(round,y)/100.+sin(i)/vis_get(round,r)*ratio);
-            glEnd();
-        }
-        ,x,y,r,d);
-
-        desribe_visual(tri,600,400,600,400,
-        {
-            glColor3f(vis_get(tri,r)/100.,vis_get(tri,g)/100.,vis_get(tri,b)/100.);
-            glPushMatrix();
-            
-            glTranslatef(vis_get(tri,x)/100.,vis_get(tri,y)/100.,0);
-            glRotatef(vis_get(tri,a),0,0,1);
-
-            glBegin(GL_TRIANGLES);
-                glVertex2f(0,0);
-                glVertex2f(.25,.5);
-                glVertex2f(.5,0);
-            glEnd();
-
-            glPopMatrix();
-        }
-        ,x,y,a,r,g,b);
-        
+        Fl::add_timeout(.025,timer,&graph);
+    
     win.end();
     win.show();
+    win.resizable(graph);
 
     return Fl::run();
 }

@@ -25,7 +25,8 @@ class visual:public Fl_Group
                 glLoadIdentity();
                 glViewport(0,0,w(),h());
                 glOrtho(0,1,0,1,-1,1);
-                //glPointSize(5);
+                glLineWidth(3);
+                glPointSize(5);
             }
 
             glClearColor(0,0,0,1);
@@ -78,7 +79,7 @@ public:
             for(size_t i=0;i<count;i++)
             {
                 p[i]->selection_color(i);
-                p[i]->minimum(0);
+                p[i]->minimum(1);
                 p[i]->maximum(100);
                 p[i]->type(1);
                 p[i]->align(FL_ALIGN_TOP);
@@ -95,6 +96,8 @@ public:
     inline
     void update(const size_t id)
     {params[id]=p[id]->value();c->redraw();}
+
+    inline void redraw(){c->redraw();}
 };
 
 const char*params_beauty(const char*text)
