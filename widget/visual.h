@@ -16,7 +16,8 @@ class visual:public Fl_Group
     class canvas:public Fl_Gl_Window
     {
         int*params;
-        void(*repaint)(int*);
+        void(*repaint)(int*,void*);
+        void*memory;
         
         void draw()
         {
@@ -29,14 +30,14 @@ class visual:public Fl_Group
                 glPointSize(5);
             }
 
-            glClearColor(0,0,0,1);
+            glClearColor(0,0,0,0);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            repaint(params);
+            repaint(params,memory);
         }
     public:
-        canvas(const int x,const int y,const int w,const int h,void(*f)(int*),int*p)
-            :Fl_Gl_Window(x,y,w,h),repaint(f),params(p)
+        canvas(const int x,const int y,const int w,const int h,void(*f)(int*,void*),int*p,void*d)
+            :Fl_Gl_Window(x,y,w,h),repaint(f),params(p),memory(d)
         {}
     };
 
@@ -46,7 +47,7 @@ class visual:public Fl_Group
     Fl_Slider*p[count];
 public:
 
-    visual(const int x,const int y,const int w,const int h,void(*f)(int*),const char*names=0)
+    visual(const int x,const int y,const int w,const int h,void(*f)(int*,void*),void*d,const char*names=0)
         :Fl_Group(x,y,w,h)
     {
         const size_t slider_size=200;
@@ -59,7 +60,7 @@ public:
 
         const size_t slider_hax=slider_pos+slider_double;
 
-        c=new canvas(x,y,w,slider_pos-y,f,params);
+        c=new canvas(x,y,w,slider_pos-y,f,params,d);
 
         s=new Fl_Scroll(x,slider_pos,w,slider_size);
             m=new Fl_Box(x+slider_metric,slider_pos,slider_wide,slider_metric);
@@ -92,12 +93,15 @@ public:
 
         end();
     }
+    
+    inline void redraw(){c->redraw();}
 
     inline
     void update(const size_t id)
     {params[id]=p[id]->value();c->redraw();}
 
-    inline void redraw(){c->redraw();}
+    inline void set(size_t id,const int v)
+    {p[id].valie(v);update();}
 };
 
 const char*params_beauty(const char*text)
@@ -116,6 +120,6 @@ const char*params_beauty(const char*text)
 #define max_letters 4
 
 #define desribe_visual(name,x,y,w,h,f,...) enum class name##_p{__VA_ARGS__,sys_last};\
-visual<size_t(name##_p::sys_last),max_letters>name(x,y,w,h,[](int*param) f,params_beauty(#__VA_ARGS__));\
+visual<size_t(name##_p::sys_last),max_letters>name(x,y,w,h,[](int*param,void*memory) f,0,params_beauty(#__VA_ARGS__));\
 
 #define vis_get(name,id) param[size_t(name##_p::id)]

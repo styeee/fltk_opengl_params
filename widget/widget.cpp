@@ -4,39 +4,37 @@
 #include "visual.h"
 #include <math.h>
 
-const size_t size=512;
+const size_t size=64;
 float points[size]={0};
 float time;
+size_t cur=0;
 
 static void timer(void*d)
 {
-    ((visual<4,2>*)d)->redraw();
+    cur=(cur+1)%size;
+    ((visual<1,2>*)d)->redraw();
     Fl::repeat_timeout(.025,timer,d);
 }
 
 int main()
 {
-
     Fl_Window win(1200,800,"line");
 
         #define max_letters 2
         desribe_visual(graph,0,0,1200,800,
         {
-            time+=(vis_get(graph,t)-1)/100.;
-
-            for(size_t i=0;i<size;i++)
-                points[i]=sin(time+i/(vis_get(graph,w)+.001))
-                *vis_get(graph,s)/100.
-                +vis_get(graph,h)/100.;
+            points[cur]=vis_get(graph,x)/100.;
 
             glBegin(GL_LINE_STRIP);
-                for(size_t i=0;i<size;i++)
-                    glVertex2f(float(i)/size,points[i]);
+                 const size_t max__=size+1;
+                 const size_t min__=size-1;
+                for(size_t i=1;i!=min__;i++)
+                    glVertex2f(float(i)/size,points[(i+cur)%min__]);
             glEnd();
         }
-        ,h,s,w,t);
-        
-        Fl::add_timeout(.025,timer,&graph);
+        ,x);
+    
+    Fl::add_timeout(.025,timer,&graph);
     
     win.end();
     win.show();
