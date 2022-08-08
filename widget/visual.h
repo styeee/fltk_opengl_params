@@ -119,7 +119,7 @@ const char*params_beauty(const char*text)
 
 #define max_letters 4
 
-#define desribe_visual(name,x,y,w,h,f,...) enum class name##_p{__VA_ARGS__,sys_last};\
-visual<size_t(name##_p::sys_last),max_letters>name(x,y,w,h,[](int*param,void*memory) f,0,params_beauty(#__VA_ARGS__));\
+#define desribe_visual(name,x,y,w,h,f,d,...) enum class name##_p{__VA_ARGS__,sys_last};\
+visual<size_t(name##_p::sys_last),max_letters>name(x,y,w,h,[](int*param,void*memory) f,d,params_beauty(#__VA_ARGS__));\
 
 #define vis_get(name,id) param[size_t(name##_p::id)]
